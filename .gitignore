@@ -1,0 +1,32 @@
+# ──────────────── Node.js ────────────────
+node_modules/
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+
+# ──────────────── Environment ────────────
+.env
+.env.local
+.env.*.local
+
+# ──────────────── Build Output ───────────
+dist/
+build/
+
+# ──────────────── Database ───────────────
+*.sqlite
+*.db
+
+# ──────────────── Logs ───────────────────
+logs/
+*.log
+
+# ──────────────── OS / Editor ────────────
+.DS_Store
+Thumbs.db
+.vscode/
+.idea/
+
+# ──────────────── Docker ─────────────────
+# Keep docker-compose.yml but ignore override
+docker-compose.override.yml

@@ -1,0 +1,65 @@
+version: '3.9'
+
+services:
+  # ─────────────────────────── MariaDB ───────────────────────────
+  mariadb:
+    image: mariadb:11
+    container_name: e_utilities_mariadb
+    restart: unless-stopped
+    environment:
+      MYSQL_ROOT_PASSWORD: rootpassword
+      MYSQL_DATABASE: e_utilities_cost
+      MYSQL_USER: app_user
+      MYSQL_PASSWORD: changeme
+    volumes:
+      - mariadb_data:/var/lib/mysql
+    ports:
+      - "3306:3306"
+    healthcheck:
+      test: ["CMD", "healthcheck.sh", "--connect", "--innodb_initialized"]
+      start_period: 10s
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+  # ─────────────────────────── Backend ───────────────────────────
+  backend:
+    build:
+      context: ./backend
+      dockerfile: Dockerfile
+    container_name: e_utilities_backend
+    restart: unless-stopped
+    depends_on:
+      mariadb:
+        condition: service_healthy
+    environment:
+      PORT: 3000
+      NODE_ENV: production
+      DB_DIALECT: mariadb
+      DB_HOST: mariadb
+      DB_PORT: 3306
+      DB_NAME: e_utilities_cost
+      DB_USER: app_user
+      DB_PASSWORD: changeme
+      JWT_SECRET: e_utilities_cost_super_secret_jwt_key_2026
+      JWT_EXPIRES_IN: 1h
+      REFRESH_TOKEN_EXPIRES_IN: 7d
+    ports:
+      - "3000:3000"
+
+  # ─────────────────────────── Frontend ──────────────────────────
+  frontend:
+    build:
+      context: ./frontend
+      dockerfile: Dockerfile
+    container_name: e_utilities_frontend
+    restart: unless-stopped
+    depends_on:
+      - backend
+    environment:
+      VITE_API_BASE_URL: http://localhost:3000
+    ports:
+      - "8080:8080"
+
+volumes:
+  mariadb_data:
