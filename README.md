@@ -58,6 +58,23 @@ docker compose down -v
 
 ---
 
+## 🔒 ระบบยืนยันตัวตน (Authentication & Security)
+
+- **JWT Authentication**: ใช้งาน Access Token (อายุ 1 ชม.) แนบใน Header `Authorization: Bearer <token>` และ Refresh Token (อายุ 7 วัน) เก็บใน HTTP-Only Cookie
+- **Password Hashing**: เข้ารหัสผ่านด้วย `bcryptjs` (salt rounds ≥ 10)
+- **Role-Based Protection**: มี Navigation Guard ใน Vue Router และ Middleware ใน Express เพื่อตรวจสอบสิทธิ์การเข้าถึงแต่ละ Endpoint
+
+### Authentication Endpoints
+
+| Method | Endpoint | Description |
+|--------|----------|-------------|
+| `POST` | `/api/auth/login` | ตรวจสอบชื่อผู้ใช้และรหัสผ่าน คืนค่า accessToken |
+| `POST` | `/api/auth/logout` | ล้าง Refresh Token cookie |
+| `POST` | `/api/auth/refresh` | ขอ accessToken ใหม่ด้วย Refresh Token |
+| `GET`  | `/api/auth/me` | ดึงข้อมูลผู้ใช้ปัจจุบันที่เข้าสู่ระบบอยู่ |
+
+---
+
 ## 💻 Local Development (without Docker)
 
 ### Backend
