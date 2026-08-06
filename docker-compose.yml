@@ -43,7 +43,7 @@ services:
       JWT_EXPIRES_IN: 1h
       REFRESH_TOKEN_EXPIRES_IN: 7d
     ports:
-      - "3001:3000"
+      - "3030:3000"
 
   # ─────────────────────────── Frontend ──────────────────────────
   frontend:
@@ -55,7 +55,7 @@ services:
     depends_on:
       - backend
     environment:
-      VITE_API_BASE_URL: http://localhost:3001
+      VITE_API_BASE_URL: http://localhost:3030
     ports:
       - "8080:8080"
 
