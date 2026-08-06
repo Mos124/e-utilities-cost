@@ -9,7 +9,7 @@
     "preview": "vite preview"
   },
   "dependencies": {
-    "@lucide/vue-next": "^0.395.0",
+    "lucide-vue-next": "^0.395.0",
     "axios": "^1.7.2",
     "chart.js": "^4.4.3",
     "pinia": "^2.1.7",
