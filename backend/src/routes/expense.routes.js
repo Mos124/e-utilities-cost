@@ -1,14 +1,15 @@
 const express = require('express');
 const router = express.Router();
 const expenseController = require('../controllers/expense.controller');
-const { verifyToken } = require('../middlewares/auth.middleware');
+const { verifyToken, requireStaffOrAdmin } = require('../middlewares/auth.middleware');
 
 router.use(verifyToken);
 
 router.get('/', expenseController.getAll);
-router.post('/', expenseController.create);
 router.get('/:id', expenseController.getById);
-router.put('/:id', expenseController.update);
-router.delete('/:id', expenseController.remove);
+
+router.post('/', requireStaffOrAdmin, expenseController.create);
+router.put('/:id', requireStaffOrAdmin, expenseController.update);
+router.delete('/:id', requireStaffOrAdmin, expenseController.remove);
 
 module.exports = router;

@@ -30,7 +30,15 @@ const requireAdmin = (req, res, next) => {
   next();
 };
 
+const requireStaffOrAdmin = (req, res, next) => {
+  if (!req.user || (req.user.role !== 'admin' && req.user.role !== 'staff')) {
+    return res.status(403).json({ message: 'ต้องมีสิทธิ์ Admin หรือ Staff ในการทำรายการนี้' });
+  }
+  next();
+};
+
 module.exports = {
   verifyToken,
-  requireAdmin
+  requireAdmin,
+  requireStaffOrAdmin
 };

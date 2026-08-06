@@ -3,29 +3,41 @@ const { User, ExpenseCategory, BudgetCategory, Expense } = require('../models');
 
 const seedInitialData = async () => {
   try {
-    // 1. Seed Users
-    const userCount = await User.count();
-    let adminUser;
-    if (userCount === 0) {
-      const hashedPassword = await bcrypt.hash('admin123', 10);
-      adminUser = await User.create({
+    // 1. Seed Users (admin, staff, user)
+    const adminPassword = await bcrypt.hash('admin123', 10);
+    const [adminUser] = await User.findOrCreate({
+      where: { username: 'admin' },
+      defaults: {
         username: 'admin',
-        password: hashedPassword,
+        password: adminPassword,
         full_name: 'ผู้ดูแลระบบสาธารณูปโภค',
         role: 'admin'
-      });
+      }
+    });
 
-      const staffPassword = await bcrypt.hash('staff123', 10);
-      await User.create({
+    const staffPassword = await bcrypt.hash('staff123', 10);
+    await User.findOrCreate({
+      where: { username: 'staff' },
+      defaults: {
         username: 'staff',
         password: staffPassword,
         full_name: 'เจ้าหน้าที่บันทึกข้อมูล',
         role: 'staff'
-      });
-      console.log('✅ Users seeded: admin / admin123, staff / staff123');
-    } else {
-      adminUser = await User.findOne({ where: { username: 'admin' } });
-    }
+      }
+    });
+
+    const userPassword = await bcrypt.hash('user123', 10);
+    await User.findOrCreate({
+      where: { username: 'user' },
+      defaults: {
+        username: 'user',
+        password: userPassword,
+        full_name: 'ผู้ใช้งานทั่วไป',
+        role: 'user'
+      }
+    });
+
+    console.log('✅ Users seeded: admin/admin123, staff/staff123, user/user123');
 
     // 2. Seed Expense Categories
     const defaultExpenseCategories = [
