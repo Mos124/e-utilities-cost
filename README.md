@@ -1,132 +1,147 @@
-# E-Utilities Cost — Utility Expense Tracking & Control System
+# ระบบควบคุม-ติดตามค่าสาธารณูปโภค (e-utilities-cost)
 
-A full-stack web application for tracking and managing utility expenses (electricity, water, etc.).
+> ระบบบันทึกและติดตามค่าสาธารณูปโภคสำหรับสถานศึกษา  
+> ครอบคลุมค่าไฟฟ้า น้ำประปา อินเตอร์เน็ต โทรศัพท์ และขยะมูลฝอย
 
-## 🛠 Tech Stack
+## 🌐 Docker Hub Images
 
-| Layer | Technology |
-|-------|-----------|
-| Frontend | Vue 3 + Vite + Tailwind CSS |
-| Backend | Node.js + Express |
-| Database | MariaDB (Docker) / SQLite (local dev) |
-| ORM | Sequelize |
-| Auth | JWT (access + refresh tokens) |
-| Container | Docker + Docker Compose |
+| Image | Pull Command |
+|-------|-------------|
+| Backend API | `docker pull mos124/e-utilities-backend:latest` |
+| Frontend App | `docker pull mos124/e-utilities-frontend:latest` |
 
 ---
 
-## 🚀 Quick Start with Docker
+## ✨ ฟีเจอร์หลัก
 
-### Prerequisites
-- [Docker Desktop](https://www.docker.com/products/docker-desktop/)
+| ฟีเจอร์ | รายละเอียด |
+|---------|-----------|
+| 📊 **Dashboard** | สรุปยอดรายเดือน, กราฟแท่ง 12 เดือน, กราฟวงกลมแยกประเภท |
+| 💸 **Expense Tracking** | บันทึก/แก้ไข/ลบ รายการค่าสาธารณูปโภค |
+| 🏷️ **Category CRUD** | จัดการประเภทค่าใช้จ่าย (Admin only) |
+| 💰 **Budget Management** | ผูกรายการกับหมวดเงินงบประมาณ (ปวช./ปวส./รายได้สถานศึกษา) |
+| 📈 **Report History** | รายงานย้อนหลัง, เปรียบเทียบปีต่อปี |
+| 🔐 **Auth (JWT)** | Login/Logout, Role-Based Access (Admin / Staff / User) |
+| 🐳 **Docker Ready** | Multi-stage build, Nginx static serve, MariaDB |
 
-### Run all services
+---
+
+## 🔑 บัญชีทดสอบ (Default Credentials)
+
+| Role | Username | Password | สิทธิ์ |
+|------|----------|----------|--------|
+| 👑 Admin | `admin` | `admin123` | เต็มรูปแบบ (CRUD ทุกเมนู) |
+| 📝 Staff | `staff` | `staff123` | บันทึก/แก้ไข ค่าใช้จ่าย |
+| 👀 User  | `user`  | `user123`  | ดู Dashboard และรายงาน |
+
+---
+
+## 🚀 วิธีรันโปรเจกต์
+
+### Option A: Docker Compose (แนะนำ - Production)
 
 ```bash
-docker compose up --build
+# ดึง images จาก Docker Hub แล้วรันทั้งระบบ
+docker compose up -d
 ```
 
-| Service | URL |
-|---------|-----|
-| Frontend | http://localhost:8080 |
-| Backend API | http://localhost:3000 |
-| MariaDB | localhost:3306 |
+- **Frontend**: http://localhost:8080
+- **Backend API**: http://localhost:3030
+- **MariaDB**: localhost:3306
 
-### Stop services
+### Option B: Build & Run เอง
 
 ```bash
-docker compose down
+# Build แล้วรัน
+docker compose -f docker-compose.build.yml up -d --build
 ```
 
-### Stop & remove volumes (reset database)
+### Option C: Local Development (Node.js)
 
 ```bash
-docker compose down -v
-```
-
----
-
-## 🔑 3 บทบาทการใช้งาน (Default Accounts & Roles)
-
-ระบบจำลองบัญชีผู้ใช้งานเริ่มต้นไว้ 3 สิทธิ์ดังนี้:
-
-| Role (สิทธิ์) | Username | Password | สิทธิ์การใช้งาน |
-|--------------|----------|----------|----------------|
-| **👑 Admin (ผู้ดูแลระบบ)** | `admin` | `admin123` | ทำได้ทุกอย่าง (จัดการหมวดหมู่, บันทึก/แก้ไข/ลบ ค่าใช้จ่าย, ดูรายงาน) |
-| **📝 Staff (เจ้าหน้าที่)** | `staff` | `staff123` | บันทึก/แก้ไข/ลบ ค่าใช้จ่าย, ดูรายงาน |
-| **👀 User (ผู้ใช้งานทั่วไป)** | `user` | `user123` | ดูแดชบอร์ด, ดูรายการค่าใช้จ่าย และดูรายงาน (ดูได้อย่างเดียว) |
-
----
-
-## 🔒 ระบบยืนยันตัวตน (Authentication & Security)
-
-- **JWT Authentication**: ใช้งาน Access Token (อายุ 1 ชม.) แนบใน Header `Authorization: Bearer <token>` และ Refresh Token (อายุ 7 วัน) เก็บใน HTTP-Only Cookie
-- **Password Hashing**: เข้ารหัสผ่านด้วย `bcryptjs` (salt rounds ≥ 10)
-- **Role-Based Protection**: มี Navigation Guard ใน Vue Router และ Middleware ใน Express เพื่อตรวจสอบสิทธิ์การเข้าถึงแต่ละ Endpoint
-
-### Authentication Endpoints
-
-| Method | Endpoint | Description |
-|--------|----------|-------------|
-| `POST` | `/api/auth/login` | ตรวจสอบชื่อผู้ใช้และรหัสผ่าน คืนค่า accessToken |
-| `POST` | `/api/auth/logout` | ล้าง Refresh Token cookie |
-| `POST` | `/api/auth/refresh` | ขอ accessToken ใหม่ด้วย Refresh Token |
-| `GET`  | `/api/auth/me` | ดึงข้อมูลผู้ใช้ปัจจุบันที่เข้าสู่ระบบอยู่ |
-
----
-
-## 💻 Local Development (without Docker)
-
-### Backend
-
-```bash
+# Terminal 1 - Backend
 cd backend
-cp .env.example .env   # edit as needed (SQLite works out of the box)
 npm install
 npm run dev
-```
+# Backend → http://localhost:3000
 
-### Frontend
-
-```bash
+# Terminal 2 - Frontend
 cd frontend
 npm install
 npm run dev
+# Frontend → http://localhost:8080
 ```
 
 ---
 
-## 📁 Project Structure
+## 🐳 Build & Push to Docker Hub
+
+```powershell
+# Login ก่อน
+docker login
+
+# รัน build script
+.\build-push.ps1
+```
+
+---
+
+## 🏗️ Tech Stack
+
+| Layer | Technology |
+|-------|-----------|
+| **Frontend** | Vue 3, Vite, Tailwind CSS, Pinia, Chart.js |
+| **Backend** | Node.js, Express.js, Sequelize ORM |
+| **Database** | SQLite (dev) / MariaDB (production) |
+| **Auth** | JWT + HttpOnly Cookie Refresh Token |
+| **Deploy** | Docker, Nginx (multi-stage), Docker Compose |
+
+---
+
+## 📁 โครงสร้างโปรเจกต์
 
 ```
-jobb4/
+e-utilities-cost/
 ├── backend/
 │   ├── src/
-│   │   ├── config/       # Database config
-│   │   ├── controllers/  # Route controllers
-│   │   ├── middlewares/  # Auth, error handling
-│   │   ├── models/       # Sequelize models
-│   │   ├── routes/       # Express routes
-│   │   └── seeders/      # Initial data
-│   ├── Dockerfile
-│   └── package.json
+│   │   ├── controllers/   # auth, expense, category, dashboard
+│   │   ├── middlewares/   # auth, error handler
+│   │   ├── models/        # User, Expense, ExpenseCategory, BudgetCategory
+│   │   ├── routes/        # auth, expense, category, dashboard
+│   │   ├── seeders/       # ข้อมูลเริ่มต้น (users, categories, sample expenses)
+│   │   ├── config/        # DB config (SQLite/MariaDB)
+│   │   ├── app.js
+│   │   └── server.js
+│   └── Dockerfile
 ├── frontend/
 │   ├── src/
-│   ├── Dockerfile
-│   └── package.json
-├── docker-compose.yml
+│   │   ├── views/         # Login, Dashboard, Expense, Category, Report
+│   │   ├── stores/        # Pinia auth store
+│   │   ├── services/      # API service, auth service
+│   │   ├── router/        # Vue Router + auth guards
+│   │   └── App.vue
+│   └── Dockerfile         # Multi-stage: Vite build + Nginx serve
+├── docker-compose.yml         # Production (uses Docker Hub images)
+├── docker-compose.build.yml   # Local build
+├── build-push.ps1             # Script สำหรับ push ไป Docker Hub
 └── README.md
 ```
 
 ---
 
-## 🔐 Environment Variables
+## 🔌 API Endpoints
 
-Copy `backend/.env.example` to `backend/.env` and adjust values.  
-**Never commit `.env` files — they are in `.gitignore`.**
-
-| Variable | Description |
-|----------|-------------|
-| `DB_DIALECT` | `sqlite` or `mariadb` |
-| `DB_HOST` | Database host |
-| `JWT_SECRET` | Secret key for JWT signing |
+| Method | Endpoint | Description | Auth |
+|--------|----------|-------------|------|
+| POST | `/api/auth/login` | เข้าสู่ระบบ | ❌ |
+| POST | `/api/auth/logout` | ออกจากระบบ | ❌ |
+| POST | `/api/auth/refresh` | Refresh access token | ❌ |
+| GET | `/api/auth/me` | ข้อมูลตัวเอง | ✅ |
+| GET | `/api/expenses` | รายการค่าใช้จ่าย | ✅ |
+| POST | `/api/expenses` | สร้างรายการ | ✅ Staff+ |
+| PUT | `/api/expenses/:id` | แก้ไขรายการ | ✅ Staff+ |
+| DELETE | `/api/expenses/:id` | ลบรายการ | ✅ Staff+ |
+| GET | `/api/expense-categories` | ประเภทค่าใช้จ่าย | ✅ |
+| GET | `/api/budget-categories` | หมวดเงินงบประมาณ | ✅ |
+| GET | `/api/dashboard/summary` | สรุป Dashboard | ✅ |
+| GET | `/api/health` | Health check | ❌ |
