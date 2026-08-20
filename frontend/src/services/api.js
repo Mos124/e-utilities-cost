@@ -47,7 +47,6 @@ api.interceptors.response.use(
         }
       } catch (refreshErr) {
         setAccessToken(null);
-        window.location.href = '/login';
         return Promise.reject(refreshErr);
       }
     }

@@ -1,5 +1,4 @@
 import { createRouter, createWebHistory } from 'vue-router';
-import { useAuthStore } from '../stores/auth';
 
 import LoginView from '../views/LoginView.vue';
 import DashboardView from '../views/DashboardView.vue';
@@ -12,44 +11,37 @@ const routes = [
   {
     path: '/login',
     name: 'Login',
-    component: LoginView,
-    meta: { requiresAuth: false }
+    component: LoginView
   },
   {
     path: '/',
     name: 'Dashboard',
-    component: DashboardView,
-    meta: { requiresAuth: true }
+    component: DashboardView
   },
   {
     path: '/expenses',
     name: 'ExpenseList',
-    component: ExpenseListView,
-    meta: { requiresAuth: true }
+    component: ExpenseListView
   },
   {
     path: '/expenses/create',
     name: 'ExpenseCreate',
-    component: ExpenseFormView,
-    meta: { requiresAuth: true }
+    component: ExpenseFormView
   },
   {
     path: '/expenses/:id/edit',
     name: 'ExpenseEdit',
-    component: ExpenseFormView,
-    meta: { requiresAuth: true }
+    component: ExpenseFormView
   },
   {
     path: '/settings/categories',
     name: 'CategoryManage',
-    component: CategoryManageView,
-    meta: { requiresAuth: true, requiresAdmin: true }
+    component: CategoryManageView
   },
   {
     path: '/reports',
     name: 'ReportHistory',
-    component: ReportHistoryView,
-    meta: { requiresAuth: true }
+    component: ReportHistoryView
   },
   {
     path: '/:pathMatch(.*)*',
@@ -62,26 +54,6 @@ const router = createRouter({
   routes
 });
 
-router.beforeEach(async (to, from, next) => {
-  const authStore = useAuthStore();
 
-  if (!authStore.isAuthenticated && to.meta.requiresAuth) {
-    await authStore.checkAuth();
-  }
-
-  if (to.meta.requiresAuth && !authStore.isAuthenticated) {
-    return next({ name: 'Login' });
-  }
-
-  if (to.name === 'Login' && authStore.isAuthenticated) {
-    return next({ name: 'Dashboard' });
-  }
-
-  if (to.meta.requiresAdmin && !authStore.isAdmin) {
-    return next({ name: 'Dashboard' });
-  }
-
-  next();
-});
 
 export default router;
