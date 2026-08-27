@@ -63,7 +63,7 @@ docker compose -f docker-compose.build.yml up -d --build
 cd backend
 npm install
 npm run dev
-# Backend → http://localhost:3001
+# Backend → http://localhost:3000
 
 # Terminal 2 - Frontend
 cd frontend
@@ -146,3 +146,25 @@ e-utilities-cost/
 | GET | `/api/budget-categories` | หมวดเงินงบประมาณ | ✅ |
 | GET | `/api/dashboard/summary` | สรุป Dashboard | ✅ |
 | GET | `/api/health` | Health check | ❌ |
+
+---
+
+## ⚙️ CI/CD Pipeline (GitHub Actions)
+
+โปรเจกต์นี้มีระบบ CI/CD อัตโนมัติผ่าน GitHub Actions อยู่ในโฟลเดอร์ `.github/workflows/`:
+
+1. **Continuous Integration (`ci.yml`)**:
+   - ตรวจสอบความถูกต้องและทดสอบ Backend (`npm test`)
+   - ตรวจสอบการ Build ของ Frontend (`npm run build`)
+   - ทดสอบการ Build Docker Image ทั้ง Backend และ Frontend (Dry Run)
+   - ทำงานอัตโนมัติเมื่อมีการ `push` หรือสร้าง `pull_request` เข้า `master` หรือ `main`
+
+2. **Continuous Deployment (`cd.yml`)**:
+   - เมื่อมีการ `push` ไปยัง branch `master` หรือ `main`
+   - ทำการ Build และ Push Docker Images ไปยัง Docker Hub อัตโนมัติ (`mos124/e-utilities-backend` และ `mos124/e-utilities-frontend`)
+
+### การตั้งค่า Secrets บน GitHub:
+ไปที่ Repository -> **Settings** -> **Secrets and variables** -> **Actions** และเพิ่ม Secrets ต่อไปนี้:
+- `DOCKER_USERNAME` : Username บน Docker Hub (เช่น `mos124`)
+- `DOCKER_PASSWORD` : Access Token หรือ Password บน Docker Hub
+
