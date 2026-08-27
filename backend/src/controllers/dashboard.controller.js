@@ -1,6 +1,24 @@
 const { Expense, ExpenseCategory, BudgetCategory, sequelize } = require('../models');
 const { Op } = require('sequelize');
 
+const getMonthIndex = (dateVal) => {
+  if (!dateVal) return 0;
+  let str = '';
+  if (typeof dateVal === 'string') {
+    str = dateVal;
+  } else if (dateVal instanceof Date) {
+    str = dateVal.toISOString().slice(0, 10);
+  } else {
+    str = String(dateVal);
+  }
+  const parts = str.split('-');
+  if (parts.length >= 2) {
+    const m = parseInt(parts[1], 10) - 1;
+    if (!isNaN(m) && m >= 0 && m < 12) return m;
+  }
+  return new Date(dateVal).getMonth();
+};
+
 const getSummary = async (req, res, next) => {
   try {
     const year = parseInt(req.query.year) || new Date().getFullYear();
@@ -27,7 +45,7 @@ const getSummary = async (req, res, next) => {
     yearExpenses.forEach(exp => {
       const amt = parseFloat(exp.amount) || 0;
       yearTotal += amt;
-      const m = new Date(exp.billing_month).getMonth(); // 0-11
+      const m = getMonthIndex(exp.billing_month); // 0-11
       if (m >= 0 && m < 12) {
         monthlyTotal[m] += amt;
       }
@@ -107,7 +125,7 @@ const getByBudget = async (req, res, next) => {
       // Monthly breakdown per budget
       const monthly = Array(12).fill(0);
       bExpenses.forEach(e => {
-        const m = new Date(e.billing_month).getMonth();
+        const m = getMonthIndex(e.billing_month);
         if (m >= 0 && m < 12) {
           monthly[m] += parseFloat(e.amount || 0);
         }
@@ -144,7 +162,7 @@ const compareYears = async (req, res, next) => {
       expenses.forEach(e => {
         const amt = parseFloat(e.amount || 0);
         total += amt;
-        const m = new Date(e.billing_month).getMonth();
+        const m = getMonthIndex(e.billing_month);
         if (m >= 0 && m < 12) monthly[m] += amt;
       });
       return { year: yr, total, monthly };
