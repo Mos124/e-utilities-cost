@@ -3,8 +3,8 @@ import { authService } from '../services/auth.service';
 
 export const useAuthStore = defineStore('auth', {
   state: () => ({
-    user: { id: 1, username: 'admin', full_name: 'Administrator', role: 'admin' },
-    isAuthenticated: true,
+    user: null,
+    isAuthenticated: false,
     loading: false,
     error: null
   }),
