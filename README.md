@@ -124,6 +124,7 @@ e-utilities-cost/
 ├── docker-compose.yml         # Production (uses Docker Hub images)
 ├── docker-compose.build.yml   # Local build
 ├── build-push.ps1             # Script สำหรับ push ไป Docker Hub
+├── plan.md                    # เอกสารแผนการดำเนินงานและออกแบบระบบ
 └── README.md
 ```
 
