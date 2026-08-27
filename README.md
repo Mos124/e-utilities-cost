@@ -45,9 +45,9 @@
 docker compose up -d
 ```
 
-- **Frontend**: http://localhost:8080
+- **Frontend**: http://localhost:8081
 - **Backend API**: http://localhost:3030
-- **MariaDB**: localhost:3306
+- **MariaDB**: localhost:3307
 
 ### Option B: Build & Run เอง
 
@@ -63,13 +63,13 @@ docker compose -f docker-compose.build.yml up -d --build
 cd backend
 npm install
 npm run dev
-# Backend → http://localhost:3000
+# Backend → http://localhost:3001
 
 # Terminal 2 - Frontend
 cd frontend
 npm install
 npm run dev
-# Frontend → http://localhost:8080
+# Frontend → http://localhost:8081
 ```
 
 ---
